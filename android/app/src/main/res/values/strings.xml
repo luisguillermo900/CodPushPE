@@ -2,4 +2,5 @@
     <string name="app_name">MiAppCodePushPE</string>
     <string name="appCenterCrashes_whenToSendCrashes" moduleConfig="true" translatable="false">DO_NOT_ASK_JAVASCRIPT</string>
     <string name="appCenterAnalytics_whenToEnableAnalytics" moduleConfig="true" translatable="false">ALWAYS_SEND</string>
+    <string name="CodePushDeploymentKey">3538ca22-88ad-496b-a07f-df1d1c93d42d</string>
 </resources>
