@@ -1,97 +1,163 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# MiAppCodePushPE
 
-# Getting Started
+Este proyecto fue creado con [React Native](https://reactnative.dev) y usa `react-native-code-push` para actualizaciones OTA (Over-The-Air), permitiendo distribuir nuevas versiones sin necesidad de Play Store.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## Requisitos previos
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+Antes de comenzar, asegúrate de tener instalado lo siguiente:
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- Node.js 18.x o superior
+- Android Studio (con emulador o dispositivo físico conectado)
+- JDK 11 o superior
+- React Native CLI:
 
-```sh
-# Using npm
+```bash
+npm install -g react-native-cli
+```
+
+- App Center CLI:
+
+```bash
+npm install -g appcenter-cli
+```
+
+---
+
+## Instalación del proyecto
+
+```bash
+npx react-native init MiAppCodePushPE
+cd MiAppCodePushPE
+```
+
+Instala las dependencias necesarias:
+
+```bash
+npm install react-native-code-push@8.0.4             appcenter             appcenter-analytics             appcenter-crashes
+```
+
+---
+
+## Configuración de Android
+### 1. Clave de CodePush
+
+Edita el archivo `android/app/build.gradle` y agrega la clave:
+
+```gradle
+android {
+    ...
+    defaultConfig {
+        ...
+        resValue "string", "CodePushDeploymentKey", '"TU_DEPLOYMENT_KEY"'
+    }
+}
+```
+
+### 2. MainApplication.java
+
+Edita `android/app/src/main/java/com/miappcodepushpe/MainApplication.java`:
+
+```java
+import com.microsoft.codepush.react.CodePush;
+
+@Override
+protected String getJSBundleFile() {
+  return CodePush.getJSBundleFile();
+}
+
+@Override
+protected List<ReactPackage> getPackages() {
+  return Arrays.<ReactPackage>asList(
+      new MainReactPackage(),
+      new CodePush(BuildConfig.CodePushDeploymentKey, getApplicationContext(), BuildConfig.DEBUG)
+  );
+}
+```
+
+---
+
+## 🧹 Limpiar y reconstruir
+
+```bash
+cd android
+./gradlew clean
+cd ..
+```
+
+---
+
+## Ejecutar la app
+
+### Inicia Metro:
+
+```bash
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
+### En otra terminal:
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```bash
+npx react-native run-android
 ```
 
-### iOS
+---
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## Código de ejemplo (`App.js` o `App.tsx`)
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+```tsx
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import codePush from 'react-native-code-push';
 
-```sh
-bundle install
+let codePushOptions = { checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
+
+const App = () => {
+  useEffect(() => {
+    codePush.sync({
+      updateDialog: {
+        title: "Actualización disponible",
+        optionalUpdateMessage: "¿Deseas instalar la nueva versión?",
+        optionalIgnoreButtonLabel: "Luego",
+        optionalInstallButtonLabel: "Actualizar"
+      },
+      installMode: codePush.InstallMode.IMMEDIATE
+    });
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Versión inicial v1.0</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  text: { fontSize: 18 }
+});
+
+export default codePush(codePushOptions)(App);
 ```
 
-Then, and every time you update your native dependencies, run:
+---
 
-```sh
-bundle exec pod install
+## Subir una actualización OTA
+
+1. Haz cambios en tu app.
+2. Luego ejecuta:
+
+```bash
+appcenter codepush release-react -a TU_USUARIO/TU_APP -d Staging
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+> Asegúrate de reemplazar `TU_USUARIO/TU_APP` con tu nombre de usuario y nombre de la app en App Center.
 
-```sh
-# Using npm
-npm run ios
+---
 
-# OR using Yarn
-yarn ios
-```
+## Recursos útiles
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- [Documentación oficial de React Native](https://reactnative.dev/docs/getting-started)
+- [react-native-code-push en GitHub](https://github.com/microsoft/react-native-code-push)
+- [App Center](https://appcenter.ms)
