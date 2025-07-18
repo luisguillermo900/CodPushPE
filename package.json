@@ -10,9 +10,13 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native/new-app-screen": "0.80.1",
+    "appcenter": "5.0.3",
+    "appcenter-analytics": "5.0.3",
+    "appcenter-crashes": "5.0.3",
     "react": "19.1.0",
     "react-native": "0.80.1",
-    "@react-native/new-app-screen": "0.80.1"
+    "react-native-code-push": "^9.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
